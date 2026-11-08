@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#123b5d">
+<title>نظام تقييم مستويات السباحين</title>
+<style>
+:root{--navy:#123b5d;--blue:#2878c8;--green:#21864b;--red:#d94a4a;--bg:#f3f6fa;--ink:#1d2b38;--muted:#647487;--line:#dce4ec}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif}
+header{background:linear-gradient(120deg,#123b5d,#1d638c);color:white;padding:22px 16px 18px;text-align:center}
+header h1{font-size:23px;margin:0 0 6px}header p{margin:0;font-size:13px;opacity:.9}
+main{max-width:1000px;margin:18px auto;padding:0 12px 40px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 3px 12px #183a5510}
+h2{font-size:18px;color:var(--navy);margin:0 0 14px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+label{display:block;font-size:13px;font-weight:700;color:#405469;margin-bottom:5px}
+input,select,textarea{width:100%;padding:11px 10px;border:1px solid #cbd6e1;border-radius:9px;font:inherit;background:#fff;color:var(--ink);min-width:0}
+button{border:0;border-radius:9px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer}
+.primary{background:var(--navy);color:#fff}.secondary{background:#e8eef4;color:var(--navy)}.danger{background:#fff0f0;color:#b52d2d}.small{padding:7px 10px;font-size:12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.level{border:1px solid var(--line);border-radius:11px;margin:12px 0;overflow:hidden}
+.level-head{background:#edf3f8;padding:11px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.level-head strong{color:var(--navy)}
+.skill{display:grid;grid-template-columns:minmax(0,1fr) minmax(150px,210px) auto;gap:9px;align-items:center;padding:10px 12px;border-top:1px solid #edf1f5}
+.skill-name{font-size:14px;line-height:1.5}
+.status{font-weight:700;border-width:1px}
+.status.mastered{background:#e5f5eb;color:#176c39;border-color:#9bd4ae}
+.status.practice{background:#e7f1ff;color:#175da7;border-color:#a9c9f0}
+.status.pending{background:#ffebeb;color:#b62e2e;border-color:#efb0b0}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 14px}
+.pill{font-size:12px;font-weight:700;padding:6px 10px;border-radius:20px}
+.pill.green{background:#e5f5eb;color:#176c39}.pill.blue{background:#e7f1ff;color:#175da7}.pill.red{background:#ffebeb;color:#b62e2e}
+.level-tools{display:flex;gap:6px}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.stat{padding:10px;border-radius:9px;text-align:center;background:#f4f7fa}.stat b{display:block;font-size:21px}.stat span{font-size:12px;color:var(--muted)}
+#savedList{display:flex;gap:8px;flex-wrap:wrap}
+.saved-item{display:flex;align-items:center;gap:7px;background:#f1f5f8;border:1px solid var(--line);padding:7px 9px;border-radius:9px}
+.saved-item button{padding:5px 8px}
+.note{color:var(--muted);font-size:12px;line-height:1.7}
+.search-box{margin:0 0 12px}
+.progress-row{display:grid;grid-template-columns:110px minmax(60px,1fr) 42px;gap:9px;align-items:center;margin:8px 0;font-size:12px}
+.progress-track{height:9px;background:#e8eef4;border-radius:20px;overflow:hidden}
+.progress-fill{height:100%;background:var(--green);border-radius:20px}
+.level-approval{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:11px 12px;background:#f7fafc;border-top:1px solid var(--line)}
+.approved-label{font-size:12px;font-weight:700;color:var(--green)}
+#backToTop{position:fixed;bottom:18px;left:18px;z-index:99;background:var(--navy);color:#fff;border-radius:50%;width:46px;height:46px;padding:0;box-shadow:0 4px 14px #0003;font-size:20px;display:none}
+@media print{#backToTop{display:none!important}}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:10px}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.skill{grid-template-columns:1fr;gap:7px}.skill .status{width:100%}.level-head{align-items:flex-start}.summary{grid-template-columns:repeat(3,1fr)}}
+@media print{
+ @page{size:A4;margin:12mm}
+ body{background:#fff;font-size:12px}
+ header{background:#fff!important;color:#123b5d;padding:0 0 12px;border-bottom:2px solid #123b5d}
+ header h1{font-size:20px}header p{color:#405469}
+ main{max-width:none;margin:10px 0;padding:0}
+ .no-print,button,.level-tools{display:none!important}
+ .panel{box-shadow:none;border:0;padding:8px 0;margin:0}
+ .level{break-inside:avoid;margin:8px 0}
+ .level-head{background:#edf3f8!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .skill{padding:6px 9px}
+ .status{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .summary{break-inside:avoid}
+ footer{display:block}
+}
+</style>
+</head>
+<body>
+<header>
+ <h1>نظام تقييم مستويات السباحين</h1>
+ <p>نموذج متابعة المهارات وتحديد مستوى إتقان السباح</p>
+ <p id="printIdentity" style="display:none"></p>
+</header>
+<main>
+ <section class="panel no-print">
+  <h2>بيانات السباح</h2>
+  <div class="grid">
+   <div><label for="swimmerName">اسم السباح</label><input id="swimmerName" placeholder="اكتب اسم السباح"></div>
+   <div><label for="swimmerCode">كود السباح</label><input id="swimmerCode" placeholder="كود السباح"></div>
+   <div><label for="birthYear">سنة الميلاد</label><input id="birthYear" type="number" min="1900" max="2100" placeholder="مثال: 2017"></div>
+  </div>
+  <div class="actions">
+   <button class="primary" onclick="saveSwimmer()">حفظ ملف السباح</button>
+   <button class="secondary" onclick="newSwimmer()">ملف جديد</button>
+   <button class="secondary" onclick="printReport()">طباعة / مشاركة PDF</button>
+  </div>
+  <p class="note">يتم حفظ الملفات والمهارات على هذا الجهاز والمتصفح. لإنشاء ملف PDF اختر «طباعة / مشاركة PDF»، ثم استخدم خيار حفظ PDF أو المشاركة من قائمة الطباعة في الجهاز.</p>
+ </section>
+
+ <section class="panel">
+  <h2>تقييم المهارات</h2>
+  <div class="legend">
+   <span class="pill green">متقن</span><span class="pill blue">يحتاج تدريب</span><span class="pill red">لم يتم التقييم</span>
+  </div>
+  <div id="levels"></div>
+  <div class="summary" id="summary"></div>
+  <div id="levelProgress" class="no-print" style="margin-top:14px"></div>
+  <div class="actions no-print">
+   <button class="primary" onclick="addLevel()">＋ إضافة مستوى</button>
+   <button class="secondary" onclick="resetStatuses()">إعادة جميع التقييمات إلى لم يتم التقييم</button>
+  </div>
+ </section>
+
+ <section class="panel no-print">
+  <h2>ملفات السباحين المحفوظة</h2>
+  <div class="search-box"><label for="swimmerSearch">البحث عن سباح بالاسم أو الكود</label><input id="swimmerSearch" type="search" placeholder="اكتب اسم السباح أو الكود..." oninput="renderSaved()"></div>
+  <div id="savedList"><span class="note">لا توجد ملفات محفوظة بعد.</span></div>
+ </section>
+ <section class="panel no-print">
+  <h2>إدارة المهارات والمستويات</h2>
+  <p class="note">يمكنك تعديل اسم أي مهارة أو حذفها أو إضافة مهارات جديدة داخل المستوى. التعديلات على قائمة المهارات عامة وتظهر عند فتح أي ملف سباح على هذا الجهاز.</p>
+  <div class="actions">
+   <button class="secondary" onclick="exportBackup()">تصدير نسخة احتياطية للبيانات</button>
+   <button class="secondary" onclick="document.getElementById('importFile').click()">استيراد نسخة احتياطية</button>
+   <input id="importFile" type="file" accept="application/json" style="display:none" onchange="importBackup(event)">
+  </div>
+ </section>
+</main>
+<footer>نظام تقييم مستويات السباحين</footer>
+<script>
+const initialLevels = [
+ {name:"المستوى 1",skills:["5 relaxed bobbles","Open eyes underwater","Bobbing with bubbles and air exchange","Back float and recover 10 sec (star fish)","Front float and recover 10 sec (star fish)","Front glide and recover","Head lead back glide and recover"]},
+ {name:"المستوى 2",skills:["Arms lead back glide and recover","Roll over (back to front, front to back)","Water safety (tread water for 10 sec)","Torpedo kicking with breathing with good body position for 10 m","Arms lead backstroke kick with good body position for 10 m"]},
+ {name:"المستوى 3",skills:["Backstroke kicking with rotation for 10 m","STRL kicking roll over for 10 m","Water safety (tread water for 20 sec)","Kick roll over (front to back, back to front)","Front kick with rotation 3 position (right, front, left)","Freestyle pull without breathing (human drill)"]},
+ {name:"المستوى 4",skills:["Catch up freestyle without breathing","Backstroke kick with rotation","Single arm backstroke with rotation 3 sec","Static Olympic backstroke with rotation 3 sec","Side breathing skills","Catch up freestyle with breathing every 6 kicks","Freestyle each 3 stroke breathing"]},
+ {name:"المستوى 5",skills:["Olympic backstroke with rotation","Push off with streamline front dolphin kick","Push off with streamline back dolphin kick","Push off with streamline front dolphin kick","25 m freestyle (start, finish)","Freestyle flip turn"]},
+ {name:"المستوى 6",skills:["Push off with streamline back dolphin kick","25 m Backstroke (start, finish)","Backstroke flip turn"]}
+];
+const statuses=[{v:"mastered",t:"متقن"},{v:"practice",t:"يحتاج تدريب"},{v:"pending",t:"لم يتم التقييم"}];
+let levels=JSON.parse(localStorage.getItem("swim_levels_v1")||"null")||initialLevels.map(x=>({...x,skills:x.skills.map(name=>({name}))}));
+let current={name:"",code:"",birthYear:"",ratings:{},approvedLevels:{}};
+let swimmers=JSON.parse(localStorage.getItem("swim_swimmers_v1")||"[]");
+function persistLevels(){localStorage.setItem("swim_levels_v1",JSON.stringify(levels))}
+function key(l,s){return l+"_"+s}
+function render(){
+ const root=document.getElementById("levels");root.innerHTML="";
+ levels.forEach((level,li)=>{
+  const wrap=document.createElement("div");wrap.className="level";
+  const head=document.createElement("div");head.className="level-head";
+  const title=document.createElement("strong");title.textContent=level.name;
+  const tools=document.createElement("div");tools.className="level-tools no-print";
+  const rename=document.createElement("button");rename.className="secondary small";rename.textContent="تعديل المستوى";rename.onclick=()=>{let n=prompt("اسم المستوى:",level.name);if(n&&n.trim()){level.name=n.trim();persistLevels();render()}};
+  const add=document.createElement("button");add.className="secondary small";add.textContent="+ مهارة";add.onclick=()=>{let n=prompt("اسم المهارة الجديدة:");if(n&&n.trim()){level.skills.push({name:n.trim()});persistLevels();render()}};
+  const del=document.createElement("button");del.className="danger small";del.textContent="حذف المستوى";del.onclick=()=>{if(confirm("حذف هذا المستوى وجميع مهاراته؟")){levels.splice(li,1);persistLevels();render()}};
+  tools.append(rename,add,del);head.append(title,tools);wrap.append(head);
+  level.skills.forEach((skill,si)=>{
+   const row=document.createElement("div");row.className="skill";
+   const nm=document.createElement("div");nm.className="skill-name";nm.textContent=skill.name;
+   const sel=document.createElement("select");sel.className="status "+(current.ratings[key(li,si)]||"pending");
+   statuses.forEach(st=>{let o=document.createElement("option");o.value=st.v;o.textContent=st.t;sel.append(o)});
+   sel.value=current.ratings[key(li,si)]||"pending";sel.onchange=()=>{current.ratings[key(li,si)]=sel.value;sel.className="status "+sel.value;updateSummary()};
+   const edit=document.createElement("div");edit.className="no-print actions";edit.style.margin="0";
+   const eb=document.createElement("button");eb.className="secondary small";eb.textContent="تعديل";eb.onclick=()=>{let n=prompt("تعديل اسم المهارة:",skill.name);if(n&&n.trim()){skill.name=n.trim();persistLevels();render()}};
+   const db=document.createElement("button");db.className="danger small";db.textContent="حذف";db.onclick=()=>{if(confirm("حذف المهارة؟")){level.skills.splice(si,1);persistLevels();render()}};
+   edit.append(eb,db);row.append(nm,sel,edit);wrap.append(row);
+  });
+  root.append(wrap);
+ });
+ updateSummary();renderSaved();
+}
+function escapeHtml(value){return String(value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function updateSummary(){
+ let counts={mastered:0,practice:0,pending:0};
+ levels.forEach((l,li)=>l.skills.forEach((s,si)=>counts[current.ratings[key(li,si)]||"pending"]++));
+ const total=counts.mastered+counts.practice+counts.pending;
+ const pct=total?Math.round(counts.mastered/total*100):0;
+ document.getElementById("summary").innerHTML=`<div class="stat"><b style="color:#21864b">${counts.mastered}</b><span>مهارة متقنة</span></div><div class="stat"><b style="color:#2878c8">${counts.practice}</b><span>تحتاج تدريب</span></div><div class="stat"><b style="color:#d94a4a">${counts.pending}</b><span>لم يتم تقييمها</span></div><div class="stat" style="grid-column:1/-1"><b style="color:#123b5d">${pct}%</b><span>نسبة الإتقان الإجمالية</span></div>`;
+ const progress=document.getElementById("levelProgress");
+ progress.innerHTML="<h3 style='font-size:14px;color:#123b5d;margin:0 0 8px'>نسبة الإتقان حسب المستوى</h3>";
+ levels.forEach((l,li)=>{let n=l.skills.length;let m=l.skills.filter((s,si)=>(current.ratings[key(li,si)]||"pending")==="mastered").length;let p=n?Math.round(m/n*100):0;progress.innerHTML+=`<div class="progress-row"><span>${escapeHtml(l.name)}</span><div class="progress-track"><div class="progress-fill" style="width:${p}%"></div></div><b>${p}%</b></div>`});
+}
+function addLevel(){let n=prompt("اسم المستوى الجديد:");if(n&&n.trim()){levels.push({name:n.trim(),skills:[]});persistLevels();render()}}
+function getIdentity(){return {name:document.getElementById("swimmerName").value.trim(),code:document.getElementById("swimmerCode").value.trim(),birthYear:document.getElementById("birthYear").value.trim()}}
+function saveSwimmer(){
+ let id=getIdentity();if(!id.name){alert("يرجى إدخال اسم السباح.");return}
+ current={...id,ratings:{...current.ratings}};
+ const idx=swimmers.findIndex(x=>x.code&&x.code===id.code);
+ if(idx>=0){
+   const previous=swimmers[idx];
+   const history=Array.isArray(previous.history)?previous.history.slice():[];
+   history.push({savedAt:new Date().toISOString(),ratings:{...(previous.ratings||{})}});
+   current.history=history;
+   swimmers[idx]=current;
+ }else {current.history=[];swimmers.push(current)}
+ localStorage.setItem("swim_swimmers_v1",JSON.stringify(swimmers));renderSaved();alert("تم حفظ ملف السباح على هذا الجهاز.");
+}
+function loadSwimmer(i){current=JSON.parse(JSON.stringify(swimmers[i]));document.getElementById("swimmerName").value=current.name||"";document.getElementById("swimmerCode").value=current.code||"";document.getElementById("birthYear").value=current.birthYear||"";render()}
+function renderSaved(){
+  const root=document.getElementById("savedList");root.innerHTML="";
+  const query=(document.getElementById("swimmerSearch")?.value||"").trim().toLocaleLowerCase();
+  const matches=swimmers.map((s,i)=>({s,i})).filter(({s})=>
+    String(s.name||"").toLocaleLowerCase().includes(query) ||
+    String(s.code||"").toLocaleLowerCase().includes(query)
+  );
+  if(!matches.length){
+    root.innerHTML='<span class="note">'+(query?'لا توجد نتائج مطابقة للاسم أو الكود.':'لا توجد ملفات محفوظة بعد.')+'</span>';
+    return;
+  }
+  matches.forEach(({s,i})=>{
+    let d=document.createElement("div");d.className="saved-item";
+    let name=document.createElement("span");name.textContent=(s.name||"بدون اسم")+(s.code?" — "+s.code:"");
+    let open=document.createElement("button");open.className="secondary small";open.textContent="فتح";open.onclick=()=>loadSwimmer(i);
+    let remove=document.createElement("button");remove.className="danger small";remove.textContent="حذف";
+    remove.onclick=()=>{if(confirm("حذف ملف السباح؟")){swimmers.splice(i,1);localStorage.setItem("swim_swimmers_v1",JSON.stringify(swimmers));renderSaved()}};
+    d.append(name,open,remove);root.append(d);
+  });
+}
+function newSwimmer(){current={name:"",code:"",birthYear:"",ratings:{},approvedLevels:{}};["swimmerName","swimmerCode","birthYear"].forEach(id=>document.getElementById(id).value="");render()}
+function resetStatuses(){if(confirm("إعادة كل المهارات إلى لم يتم التقييم؟")){current.ratings={};render()}}
+function printReport(){
+ const id=getIdentity();if(id.name)current={...current,...id};
+ if(!current.name){alert("أدخل اسم السباح أولاً.");return}
+ const old=document.title;
+ const pi=document.getElementById("printIdentity");
+ pi.textContent=`اسم السباح: ${current.name}     الكود: ${current.code||"—"}     سنة الميلاد: ${current.birthYear||"—"}     تاريخ التقييم: ${new Date().toLocaleDateString("ar-EG")}`;
+ document.title="تقييم السباح - "+current.name;
+ const approvalReport=document.getElementById("printApprovals");
+  if(approvalReport)approvalReport.remove();
+  const approvalBox=document.createElement("div");approvalBox.id="printApprovals";approvalBox.className="panel";
+  const approvedNames=levels.map((l,i)=>current.approvedLevels&&current.approvedLevels[i]?l.name:null).filter(Boolean);
+  approvalBox.innerHTML="<h2>المستويات المعتمدة</h2><p>"+(approvedNames.length?approvedNames.map(escapeHtml).join(" — "):"لا توجد مستويات معتمدة حتى الآن")+"</p>";
+  document.querySelector("main").appendChild(approvalBox);
+  const history=Array.isArray(current.history)?current.history:[];
+ const existing=document.getElementById("printHistory");
+ if(existing)existing.remove();
+ if(history.length){
+   const box=document.createElement("div");box.id="printHistory";box.className="panel";
+   box.innerHTML=`<h2>سجل التقييمات السابقة</h2><p class="report-subtitle">عدد مرات الحفظ السابقة: ${history.length} — آخر تقييم محفوظ: ${new Date(history[history.length-1].savedAt).toLocaleDateString("ar-EG")}</p>`;
+   document.querySelector("main").appendChild(box);
+ }
+ window.print();
+ if(existing)existing.remove();
+ document.title=old;
+}
+function exportBackup(){const data={levels,swimmers};const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="نسخة-احتياطية-تقييم-السباحين.json";a.click();URL.revokeObjectURL(a.href)}
+function importBackup(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(d.levels)levels=d.levels;if(d.swimmers)swimmers=d.swimmers;persistLevels();localStorage.setItem("swim_swimmers_v1",JSON.stringify(swimmers));render();alert("تم استيراد النسخة الاحتياطية.")}catch(err){alert("تعذر قراءة ملف النسخة الاحتياطية.")}};r.readAsText(f);e.target.value=""}
+window.addEventListener("scroll",()=>{
+  const b=document.getElementById("backToTop");
+  if(b)b.style.display=window.scrollY>300?"block":"none";
+});
+render();
+</script>
+</body>
+</html>
